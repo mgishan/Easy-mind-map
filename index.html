@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindFlow - Interactive Mind Mapping Web App</title>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-dark">
+
+    <!-- Welcome Workspace -->
+    <section class="welcome-screen" id="welcome-screen" aria-label="MindFlow welcome">
+        <header class="welcome-header">
+            <div class="welcome-brand">
+                <i class="fa-solid fa-diagram-project"></i>
+                <span>MindFlow</span>
+                <span class="welcome-brand-label">Workspace</span>
+            </div>
+            <button class="btn btn-primary" id="welcome-new-map">
+                <i class="fa-solid fa-plus"></i> New Mind Map
+            </button>
+        </header>
+        <main class="welcome-main">
+            <section class="welcome-start">
+                <div class="welcome-copy">
+                    <p class="welcome-kicker">YOUR IDEAS, IN FOCUS</p>
+                    <h1>Welcome to MindFlow</h1>
+                    <p>Open a recent map or start a fresh one.</p>
+                </div>
+                <button class="btn btn-secondary" id="welcome-template">
+                    <i class="fa-solid fa-shapes"></i> Start from a template
+                </button>
+            </section>
+            <section class="recent-section" aria-labelledby="recent-heading">
+                <div class="recent-heading-row">
+                    <h2 id="recent-heading">Recent maps</h2>
+                    <span id="recent-map-count" class="recent-map-count"></span>
+                </div>
+                <div class="recent-map-list" id="recent-map-list"></div>
+            </section>
+        </main>
+    </section>
+
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+        <div class="logo-area">
+            <i class="fa-solid fa-diagram-project logo-icon"></i>
+            <span class="app-title">MindFlow</span>
+            <span class="badge">Pro</span>
+            <button class="home-nav-btn" id="btn-home" title="Back to home" aria-label="Back to home">
+                <i class="fa-solid fa-house"></i>
+            </button>
+        </div>
+
+        <div class="header-center">
+            <div class="document-title-wrapper">
+                <input type="text" id="map-title-input" value="Untitled Mind Map" aria-label="Mind Map Title" />
+                <i class="fa-solid fa-pen edit-title-icon"></i>
+            </div>
+            <span class="save-status" id="save-status"><i class="fa-solid fa-cloud-check"></i> Saved</span>
+        </div>
+
+        <div class="header-actions">
+            <!-- Search Bar -->
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="search-input" placeholder="Find node... (Ctrl+F)" aria-label="Search nodes" />
+                <span id="search-count" class="search-count"></span>
+            </div>
+
+            <!-- Preset Templates -->
+            <button class="btn btn-secondary" id="btn-templates" title="Load Template">
+                <i class="fa-solid fa-shapes"></i> Templates
+            </button>
+
+            <!-- Map Layout Style Dropdown -->
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" id="style-dropdown-btn" title="Change Layout Style">
+                    <i class="fa-solid fa-sitemap"></i> Map Style <i class="fa-solid fa-chevron-down ml-1"></i>
+                </button>
+                <div class="dropdown-menu layout-menu" id="style-menu">
+                    <button data-layout="mindmap" class="dropdown-item active" aria-pressed="true"><i class="fa-solid fa-sitemap"></i><span>Classic Mind Map</span><i class="fa-solid fa-check layout-check" aria-hidden="true"></i></button>
+                    <button data-layout="balanced" class="dropdown-item" aria-pressed="false"><i class="fa-solid fa-diagram-project"></i><span>Balanced Mind Map</span><i class="fa-solid fa-check layout-check" aria-hidden="true"></i></button>
+                    <button data-layout="bubble" class="dropdown-item" aria-pressed="false"><i class="fa-solid fa-circle-nodes"></i><span>Bubble Map</span><i class="fa-solid fa-check layout-check" aria-hidden="true"></i></button>
+                    <button data-layout="right" class="dropdown-item" aria-pressed="false"><i class="fa-solid fa-arrow-right"></i><span>Right Logic Chart</span><i class="fa-solid fa-check layout-check" aria-hidden="true"></i></button>
+                    <button data-layout="left" class="dropdown-item" aria-pressed="false"><i class="fa-solid fa-arrow-left"></i><span>Left Logic Chart</span><i class="fa-solid fa-check layout-check" aria-hidden="true"></i></button>
+                    <button data-layout="org" class="dropdown-item" aria-pressed="false"><i class="fa-solid fa-network-wired"></i><span>Org Chart</span><i class="fa-solid fa-check layout-check" aria-hidden="true"></i></button>
+                </div>
+            </div>
+
+            <!-- Line Style Dropdown -->
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" id="line-style-dropdown-btn" title="Change Line Style">
+                    <i class="fa-solid fa-pen-ruler"></i> Line Style <i class="fa-solid fa-chevron-down ml-1"></i>
+                </button>
+                <div class="dropdown-menu" id="line-style-menu">
+                    <button data-line-style="curve" class="dropdown-item active"><i class="fa-solid fa-wave-square"></i> Curved</button>
+                    <button data-line-style="straight" class="dropdown-item"><i class="fa-solid fa-arrows-left-right"></i> Straight</button>
+                    <button data-line-style="dashed" class="dropdown-item"><i class="fa-solid fa-grip-lines"></i> Dashed</button>
+                    <button data-line-style="organic" class="dropdown-item"><i class="fa-solid fa-ruler-combined"></i> Organic</button>
+                </div>
+            </div>
+
+            <!-- Theme Selector Dropdown -->
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" id="theme-dropdown-btn" title="Change Visual Theme">
+                    <i class="fa-solid fa-palette"></i> Theme
+                </button>
+                <div class="dropdown-menu" id="theme-menu">
+                    <button data-theme="dark" class="dropdown-item active"><i class="fa-solid fa-moon"></i> Dark Neon</button>
+                    <button data-theme="light" class="dropdown-item"><i class="fa-solid fa-sun"></i> Clean Light</button>
+                </div>
+            </div>
+
+            <!-- Export Menu Dropdown -->
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" id="export-dropdown-btn">
+                    <i class="fa-solid fa-download"></i> Export <i class="fa-solid fa-chevron-down ml-1"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right" id="export-menu">
+                    <button id="export-png" class="dropdown-item"><i class="fa-solid fa-file-image"></i> PNG Image</button>
+                    <button id="export-svg" class="dropdown-item"><i class="fa-solid fa-bezier-curve"></i> SVG Vector</button>
+                    <button id="export-json" class="dropdown-item"><i class="fa-solid fa-code"></i> JSON Data</button>
+                    <button id="export-md" class="dropdown-item"><i class="fa-solid fa-file-lines"></i> Markdown Outline</button>
+                    <div class="dropdown-divider"></div>
+                    <button id="export-all-data" class="dropdown-item"><i class="fa-solid fa-box-archive"></i> Export All MindFlow Data (JSON)</button>
+                    <button id="import-all-data-btn" class="dropdown-item"><i class="fa-solid fa-box-open"></i> Import All MindFlow Data (JSON)</button>
+                    <button id="import-json-btn" class="dropdown-item"><i class="fa-solid fa-file-import"></i> Import JSON File</button>
+                </div>
+            </div>
+            <input type="file" id="import-file-input" accept=".json" style="display: none;" />
+
+            <!-- Shortcuts Info Modal Toggle -->
+            <button class="btn btn-icon btn-secondary" id="btn-shortcuts" title="Keyboard Shortcuts">
+                <i class="fa-solid fa-keyboard"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="workspace">
+
+        <!-- Left Toolbar (Node Operations) -->
+        <aside class="action-bar floating-card">
+            <button class="tool-btn" id="btn-add-child" title="Add Sub-topic (Tab)">
+                <i class="fa-solid fa-plus-circle"></i>
+                <span>Sub-topic</span>
+            </button>
+            <button class="tool-btn" id="btn-add-sibling" title="Add Sibling (Enter)">
+                <i class="fa-solid fa-diagram-next"></i>
+                <span>Sibling</span>
+            </button>
+            <button class="tool-btn danger" id="btn-delete-node" title="Delete Node (Delete/Backspace)">
+                <i class="fa-solid fa-trash-can"></i>
+                <span>Delete</span>
+            </button>
+            <button class="tool-btn danger" id="btn-clear-all-data" title="Clear all mind map data">
+                <i class="fa-solid fa-eraser"></i>
+                <span>Clear All Data</span>
+            </button>
+
+            <div class="bar-divider"></div>
+
+            <button class="tool-btn" id="btn-undo" title="Undo (Ctrl+Z)">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Undo</span>
+            </button>
+            <button class="tool-btn" id="btn-redo" title="Redo (Ctrl+Y)">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>Redo</span>
+            </button>
+
+            <div class="bar-divider"></div>
+
+            <button class="tool-btn" id="btn-expand-all" title="Expand All Branches">
+                <i class="fa-solid fa-folder-open"></i>
+                <span>Expand All</span>
+            </button>
+            <button class="tool-btn" id="btn-collapse-all" title="Collapse Sub-branches">
+                <i class="fa-solid fa-folder"></i>
+                <span>Collapse</span>
+            </button>
+            <button class="tool-btn" id="btn-auto-layout" title="Reset & Auto Layout">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>Auto Layout</span>
+            </button>
+        </aside>
+
+        <!-- Canvas Container (Infinite Viewport) -->
+        <div class="canvas-container" id="canvas-container">
+            <div class="canvas-grid-bg"></div>
+
+            <!-- Transform Layer for Panning & Zooming -->
+            <div class="mindmap-viewport" id="mindmap-viewport">
+                <!-- SVG Layer for Connection Lines -->
+                <svg class="svg-connections" id="svg-connections">
+                    <defs>
+                        <!-- Dynamic Gradients or Markers can be inserted here -->
+                    </defs>
+                    <g id="svg-group"></g>
+                </svg>
+
+                <!-- HTML Layer for Interactive Nodes -->
+                <div class="nodes-container" id="nodes-container"></div>
+            </div>
+        </div>
+
+        <!-- Right Side Panel: Node Inspector / Property Editor -->
+        <aside class="property-panel floating-card" id="property-panel">
+            <div class="panel-header">
+                <h3><i class="fa-solid fa-sliders"></i> Node Inspector</h3>
+                <button class="btn-close" id="close-panel-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="panel-body">
+                <div class="panel-section">
+                    <label>Node Text</label>
+                    <textarea id="node-text-input" rows="2" placeholder="Enter node text..."></textarea>
+                </div>
+
+                <div class="panel-section">
+                    <label>Node Style & Color</label>
+                    <div class="color-palette">
+                        <button class="color-swatch" data-color="#4f46e5" style="background: #4f46e5;"></button>
+                        <button class="color-swatch" data-color="#06b6d4" style="background: #06b6d4;"></button>
+                        <button class="color-swatch" data-color="#10b981" style="background: #10b981;"></button>
+                        <button class="color-swatch" data-color="#f59e0b" style="background: #f59e0b;"></button>
+                        <button class="color-swatch" data-color="#ef4444" style="background: #ef4444;"></button>
+                        <button class="color-swatch" data-color="#ec4899" style="background: #ec4899;"></button>
+                        <button class="color-swatch" data-color="#8b5cf6" style="background: #8b5cf6;"></button>
+                        <button class="color-swatch" data-color="#64748b" style="background: #64748b;"></button>
+                        <input type="color" id="custom-color-picker" title="Custom color" />
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <label>Node Shape</label>
+                    <select id="node-shape-select">
+                        <option value="pill">Pill</option>
+                        <option value="circle">Circle</option>
+                    </select>
+                </div>
+
+                <div class="panel-section">
+                    <label>Icons / Emoji</label>
+                    <div class="emoji-picker">
+                        <button class="emoji-btn" data-icon="💡">💡</button>
+                        <button class="emoji-btn" data-icon="⭐">⭐</button>
+                        <button class="emoji-btn" data-icon="🚀">🚀</button>
+                        <button class="emoji-btn" data-icon="🎯">🎯</button>
+                        <button class="emoji-btn" data-icon="🔥">🔥</button>
+                        <button class="emoji-btn" data-icon="✅">✅</button>
+                        <button class="emoji-btn" data-icon="⚠️">⚠️</button>
+                        <button class="emoji-btn" data-icon="❓">❓</button>
+                        <button class="emoji-btn" data-icon="📌">📌</button>
+                        <button class="emoji-btn btn-clear-icon" data-icon="">None</button>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <label>Status / Progress</label>
+                    <select id="node-status-select">
+                        <option value="">No Status</option>
+                        <option value="todo">🔴 Not Started</option>
+                        <option value="in-progress">🟡 In Progress</option>
+                        <option value="done">🟢 Completed</option>
+                    </select>
+                </div>
+
+                <div class="panel-section">
+                    <label>Detailed Notes & Links</label>
+                    <textarea id="node-notes-input" rows="4" placeholder="Add rich context, links, or details..."></textarea>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Floating Bottom Canvas Controls (Zoom & Center) -->
+        <div class="canvas-controls floating-card">
+            <button class="control-btn" id="btn-zoom-in" title="Zoom In (+)">
+                <i class="fa-solid fa-plus"></i>
+            </button>
+
+            <span class="zoom-indicator" id="zoom-indicator">100%</span>
+
+            <button class="control-btn" id="btn-zoom-out" title="Zoom Out (-)">
+                <i class="fa-solid fa-minus"></i>
+            </button>
+
+            <div class="control-divider"></div>
+
+            <button class="control-btn" id="btn-center-view" title="Center View & Reset Pan">
+                <i class="fa-solid fa-compress"></i>
+            </button>
+            <button class="control-btn" id="btn-fit-view" title="Fit Map to Screen">
+                <i class="fa-solid fa-expand"></i>
+            </button>
+        </div>
+    </main>
+
+    <!-- Templates Modal -->
+    <div class="modal-backdrop" id="templates-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-shapes"></i> Choose a Starter Template</h2>
+                <button class="btn-close" id="close-templates-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="templates-grid">
+                    <div class="template-card" data-template="project">
+                        <div class="template-icon"><i class="fa-solid fa-list-check"></i></div>
+                        <h3>Project Roadmap</h3>
+                        <p>Structure goals, milestones, tech stack, and deliverable tasks.</p>
+                    </div>
+                    <div class="template-card" data-template="brainstorm">
+                        <div class="template-icon"><i class="fa-solid fa-lightbulb"></i></div>
+                        <h3>Idea Brainstorm</h3>
+                        <p>Explore creative concepts, pros & cons, and action items.</p>
+                    </div>
+                    <div class="template-card" data-template="architecture">
+                        <div class="template-icon"><i class="fa-solid fa-network-wired"></i></div>
+                        <h3>Web App Tech Stack</h3>
+                        <p>Map frontend, backend, database, and DevOps infrastructure.</p>
+                    </div>
+                    <div class="template-card" data-template="goals">
+                        <div class="template-icon"><i class="fa-solid fa-bullseye"></i></div>
+                        <h3>Personal Growth & Goals</h3>
+                        <p>Organize health, career, learning, and financial targets.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear All Data Confirmation -->
+    <div class="modal-backdrop" id="clear-all-modal" role="dialog" aria-modal="true" aria-labelledby="clear-all-title">
+        <div class="modal-card confirmation-modal">
+            <div class="modal-header">
+                <h2 id="clear-all-title"><i class="fa-solid fa-triangle-exclamation"></i> Clear all mind map data?</h2>
+                <button class="btn-close" id="close-clear-all-btn" aria-label="Close confirmation"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p>This will permanently remove all nodes and notes, reset the map title and layout settings, and clear undo history.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancel-clear-all-btn">Cancel</button>
+                <button class="btn btn-danger" id="confirm-clear-all-btn"><i class="fa-solid fa-eraser"></i> Clear All</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div class="modal-backdrop" id="shortcuts-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-keyboard"></i> Keyboard Shortcuts</h2>
+                <button class="btn-close" id="close-shortcuts-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="shortcuts-grid">
+                    <div class="shortcut-item"><kbd>Tab</kbd> <span>Add Sub-topic</span></div>
+                    <div class="shortcut-item"><kbd>Enter</kbd> <span>Add Sibling Node</span></div>
+                    <div class="shortcut-item"><kbd>Delete</kbd> / <kbd>Backspace</kbd> <span>Delete Selected Node</span></div>
+                    <div class="shortcut-item"><kbd>F2</kbd> or <kbd>Space</kbd> or <kbd>DblClick</kbd> <span>Edit Node Text</span></div>
+                    <div class="shortcut-item"><kbd>Arrow Keys</kbd> <span>Navigate Nodes</span></div>
+                    <div class="shortcut-item"><kbd>Ctrl</kbd> + <kbd>Z</kbd> <span>Undo Action</span></div>
+                    <div class="shortcut-item"><kbd>Ctrl</kbd> + <kbd>Y</kbd> <span>Redo Action</span></div>
+                    <div class="shortcut-item"><kbd>Ctrl</kbd> + <kbd>F</kbd> <span>Search Nodes</span></div>
+                    <div class="shortcut-item"><kbd>Drag Canvas</kbd> <span>Pan Viewport</span></div>
+                    <div class="shortcut-item"><kbd>Mouse Wheel</kbd> <span>Zoom In / Out</span></div>
+                    <div class="shortcut-item"><kbd>Drag Node</kbd> <span>Re-parent Node under Target</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu for Nodes -->
+    <div class="context-menu" id="context-menu">
+        <button id="ctx-add-child"><i class="fa-solid fa-plus"></i> Add Sub-topic (Tab)</button>
+        <button id="ctx-add-sibling"><i class="fa-solid fa-diagram-next"></i> Add Sibling (Enter)</button>
+        <button id="ctx-edit-text"><i class="fa-solid fa-pen-to-square"></i> Edit Text (F2)</button>
+        <div class="context-divider"></div>
+        <button id="ctx-expand-node"><i class="fa-solid fa-folder-open"></i> Expand Node</button>
+        <button id="ctx-collapse-node"><i class="fa-solid fa-folder"></i> Collapse Node</button>
+        <button id="ctx-inspector"><i class="fa-solid fa-sliders"></i> Node Properties</button>
+        <div class="context-divider"></div>
+        <button id="ctx-delete" class="danger"><i class="fa-solid fa-trash"></i> Delete Node</button>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
